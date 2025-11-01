@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-crud-python
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-crud-python
+  template:
+    metadata:
+      labels:
+        app: simple-crud-python
+    spec:
+      containers:
+        - name: simple-crud-python
+          image: aly666/simple-python-crud
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-crud-python
+spec:
+  selector:
+    app: simple-crud-python
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 5000
+
