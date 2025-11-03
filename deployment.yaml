@@ -1,32 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-crud-python
+  name: flask-crud-deployment
+  labels:
+    app: flask-crud
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: simple-crud-python
+      app: flask-crud
   template:
     metadata:
       labels:
-        app: simple-crud-python
+        app: flask-crud
     spec:
       containers:
-        - name: simple-crud-python
-          image: aly666/simple-python-crud
+        - name: flask-crud
+          image: aly666/flask-crud-app   # ganti jika push ke registry
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
+          env:
+            - name: FLASK_ENV
+              value: "production"
+          # Gunakan emptyDir agar SQLite tidak hilang setiap restart container
+          volumeMounts:
+            - name: db-storage
+              mountPath: /app/instance
+      volumes:
+        - name: db-storage
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: simple-crud-python
+  name: flask-crud-service
+  labels:
+    app: flask-crud
 spec:
   selector:
-    app: simple-crud-python
-  type: ClusterIP
+    app: flask-crud
   ports:
-    - port: 80
-      targetPort: 5000
+    - protocol: TCP
+      port: 5000        # port dalam cluster
+      targetPort: 5000  # port di container
+  type: ClusterIP
 

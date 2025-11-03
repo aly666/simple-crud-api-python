@@ -1,17 +1,23 @@
 FROM python:3.11-slim
 
+# Set working dir
 WORKDIR /app
 
-# Copy requirements lebih dulu (supaya layer cache tidak invalid)
-COPY requirements.txt .
+# Install dependencies for building (optional but recommended)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Copy dependency file & install Python packages
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy semua file aplikasi
+# Copy all project files
 COPY . .
 
+# Ekspos port Flask default
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+# Jalankan aplikasi
+CMD ["python", "crudapp.py"]
 
